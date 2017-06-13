@@ -12,12 +12,17 @@ Given an input key, generate N-1 cryptographically secure random values of the k
 ## Usage
 
 ```
+# Use your fav key generator!
 $ ssh-keygen -f key
 $ ls
 key            key.pub
+
+# Split the private key into 3 pieces
 $ keyxor split --num=3 ./key
 $ ls
 key            key.1            key.2            key.3            key.pub
+
+# Merge the 3 pieces back together
 $ keyxor merge ./key.* > key.new
 $ shasum key key.new
 <same hash>  key
