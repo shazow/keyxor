@@ -7,35 +7,29 @@
 
 ## Design
 
-- Use [NaCl box](https://nacl.cr.yp.to/box.html) to generate a public key and private key.
-- Use cryptographically-secure random data source to generate N-1 values and XOR against the private key, producing N components (not including the original private key) which need to be XOR'd together to produce the original private key.
-
-## Questions
-
-- [ ] Maybe skip the create feature and just do merging/splitting? No need for NaCl business, then. Bring your own PGP or ssh or whatever PKI.
+Given an input secret key, generate N-1 cryptographically secure random values of the key size. XOR the random values against the private key, producing N components (not including the original private key) which need to be XOR'd together to produce the original private key.
 
 ## Usage
 
-Fresh keys:
-
 ```
-$ keyxor create --num=3
+$ ssh-keygen -f key
 $ ls
-key.pub
-key.secret.1
-key.secret.2
-key.secret.3
-$ keyxor merge key.secret.* > key.secret
+key            key.pub
+$ keyxor split ./key
+$ ls
+key            key.1            key.2            key.3            key.pub
+$ keyxor merge ./key.* > key.new
+$ shasum key key.new
+<same hash>  key
+<same hash>  key.new
 ```
 
-Existing key:
+## Is it any good?
 
-```
-$ keyxor split key.secret --num=3
-key.secret.1
-key.secret.2
-key.secret.3
-```
+Yes.
+
+It's a very simple tool that doesn't do much heavy lifting but it's very handy if you want to require exactly N secret key components to decrypt something.
+
 
 ## License
 
