@@ -35,7 +35,7 @@ It's a very simple tool that doesn't do much heavy lifting but it's very handy i
 
 This can be applied to a symmetric key or the private half of a public-private keypair, depending on the security model you're trying to achieve.
 
-Keyxor does *not* support M of N secret sharing, like [Shamir's Secret Sharing scheme](https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing). Keyxor uses a trivial method which only works for M=N. You need _all_ the pieces to get the original key.
+Keyxor does *not* support M of N secret sharing, like [Shamir's Secret Sharing scheme](https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing). Keyxor uses a trivial method which only works for M=N. You need _all_ the pieces to get the original key. Simple is good, right?
 
 
 ## Roadmap
