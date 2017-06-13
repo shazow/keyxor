@@ -15,7 +15,7 @@ Given an input key, generate N-1 cryptographically secure random values of the k
 $ ssh-keygen -f key
 $ ls
 key            key.pub
-$ keyxor split ./key
+$ keyxor split --num=3 ./key
 $ ls
 key            key.1            key.2            key.3            key.pub
 $ keyxor merge ./key.* > key.new
