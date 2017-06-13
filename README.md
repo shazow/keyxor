@@ -33,6 +33,11 @@ It's a very simple tool that doesn't do much heavy lifting but it's very handy i
 This can be applied to a symmetric key or the private half of a public-private keypair, depending on the security model you're trying to achieve.
 
 
+## Someday?
+
+- Maybe use NaCl box to have built-in key generating and encrypting/decrypting functionality? (Worth it?)
+
+
 ## License
 
 MIT
