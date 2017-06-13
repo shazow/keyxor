@@ -10,6 +10,9 @@
 - Use [NaCl box](https://nacl.cr.yp.to/box.html) to generate a public key and private key.
 - Use cryptographically-secure random data source to generate N-1 values and XOR against the private key, producing N components (not including the original private key) which need to be XOR'd together to produce the original private key.
 
+## Questions
+
+- [ ] Maybe skip the create feature and just do merging/splitting? No need for NaCl business, then. Bring your own PGP or ssh or whatever PKI.
 
 ## Usage
 
