@@ -13,16 +13,26 @@
 
 ## Usage
 
+Fresh keys:
+
 ```
 $ keyxor create --num=3
 $ ls
 key.pub
-key.1.secret
-key.2.secret
-key.3.secret
-$ keyxor xor key.*.secret > key.secret
+key.secret.1
+key.secret.2
+key.secret.3
+$ keyxor merge key.secret.* > key.secret
 ```
 
+Existing key:
+
+```
+$ keyxor split key.secret --num=3
+key.secret.1
+key.secret.2
+key.secret.3
+```
 
 ## License
 
