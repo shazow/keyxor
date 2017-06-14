@@ -14,7 +14,6 @@ var Version = "dev"
 
 var numSplit = flag.Int("num", 2, "number of components to split the key into")
 var versionFlag = flag.Bool("version", false, "print the version and exit")
-var verboseFlag = flag.Bool("verbose", false, "print logging messages")
 
 func exit(code int, msg string, a ...interface{}) {
 	fmt.Fprintf(os.Stderr, msg+"\n", a...)
@@ -90,9 +89,6 @@ func main() {
 	if *versionFlag {
 		fmt.Printf("%s\n", Version)
 		os.Exit(0)
-	}
-	if *verboseFlag {
-		soze.SetLogger(os.Stderr)
 	}
 
 	switch cmd := flag.Arg(0); cmd {
