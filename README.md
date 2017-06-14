@@ -2,7 +2,7 @@
 
 `keyxor` is a tool for secret sharing by splitting up a key into multiple pieces which need to be XOR'd together to get the original private key. A key XOR, if you will.
 
-**Status**: Readme-driven development phase.
+**Status**: Alpha. Implementation is there, needs audit.
 
 
 ## Design
@@ -38,9 +38,15 @@ This can be applied to a symmetric key or the private half of a public-private k
 Keyxor does *not* support M of N secret sharing, like [Shamir's Secret Sharing scheme](https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing). Keyxor uses a trivial method which only works for M=N. You need _all_ the pieces to get the original key. Simple is good, right?
 
 
+## Audit?
+
+Please do. The meat is inside [soze/soze.go](https://github.com/shazow/keyxor/blob/master/soze/soze.go).
+
+
 ## Roadmap
 
-- [ ] Implement v1 as described above --^
+- [x] Implement v1 as described above --^
+- [ ] Release v1
 - [ ] **Someday**: Maybe use NaCl box to have built-in key generating and encrypting/decrypting functionality? (Is it worth it?)
 
 
