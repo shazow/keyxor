@@ -42,9 +42,8 @@ Keyxor does *not* support M of N secret sharing, like [Shamir's Secret Sharing s
 
 Please do. The meat is inside [soze/soze.go](https://github.com/shazow/keyxor/blob/master/soze/soze.go).
 
-> There is nothing interesting here.
-
-— [@mveytsman](https://github.com/mveytsman), after an informal audit on https://github.com/shazow/keyxor/tree/c2d26906fbf4120cb2dc92afd9459dca878e8c86.
+* [@mveytsman](https://github.com/mveytsman), after an informal audit on [c2d26906]( https://github.com/shazow/keyxor/tree/c2d26906fbf4120cb2dc92afd9459dca878e8c86):
+  > There is nothing interesting here.
 
 
 ## Roadmap
