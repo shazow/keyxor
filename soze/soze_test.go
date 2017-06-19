@@ -6,8 +6,6 @@ import (
 	"testing"
 )
 
-// TODO: Test wrong input sizes
-
 // Black box test
 func TestSoze(t *testing.T) {
 	input := "hello world"
@@ -31,14 +29,32 @@ func TestSoze(t *testing.T) {
 	if out1.String() == out2.String() {
 		t.Errorf("outputs should not match: %q", out1.String())
 	}
+	if out1.Len() != out2.Len() {
+		t.Errorf("mismatched split size: %d != %d", out1.Len(), out2.Len())
+	}
 
 	var result bytes.Buffer
 	if err := Merge(&result, []io.Reader{&out1, &out2}); err != nil {
 		t.Error(err)
 	}
 
-	if want, got := input, result.String(); want == got {
+	if want, got := input, result.String(); want != got {
 		t.Errorf("xor'd result does not match: want %q; got %q", want, got)
+	}
+}
+
+func TestMismatchedSize(t *testing.T) {
+	var out bytes.Buffer
+	err := Merge(&out, []io.Reader{bytes.NewBuffer([]byte{1, 2}), bytes.NewBuffer([]byte{1, 2, 3})})
+	if err == nil {
+		t.Fatal("missing mismatch error")
+	}
+	actualErr, ok := err.(ErrSizeMismatch)
+	if !ok {
+		t.Errorf("wrong error: %T", actualErr)
+	}
+	if actualErr.Actual != 3 || actualErr.Expected != 2 {
+		t.Errorf("wrong error values: %q", actualErr)
 	}
 }
 
