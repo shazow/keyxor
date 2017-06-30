@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/base32"
 	"fmt"
+	"io"
 	"os"
 
 	flags "github.com/jessevdk/go-flags"
@@ -14,6 +16,7 @@ var Version = "dev"
 type Options struct {
 	Verbose []bool `short:"v" long:"verbose" description:"Show verbose logging."`
 	Version bool   `long:"version" description:"Print version and exit."`
+	Base32  bool   `long:"base32" description:"Encode output and decode input as Base32"`
 
 	Split struct {
 		Num  int `short:"n" long:"num" description:"Number of pieces." default:"3"`
@@ -67,13 +70,26 @@ func main() {
 		exit(1, "\nMust specify a command.")
 	}
 
+	var enc Encoder
+	var dec Decoder
+	if options.Base32 {
+		encoding := base32.StdEncoding
+
+		enc = func(w io.Writer) io.WriteCloser {
+			return base32.NewEncoder(encoding, w)
+		}
+		dec = func(r io.Reader) io.Reader {
+			return base32.NewDecoder(encoding, r)
+		}
+	}
+
 	switch parser.Active.Name {
 	case "split":
-		if err := splitKey(options.Split.Args.Key, options.Split.Num); err != nil {
+		if err := splitKey(options.Split.Args.Key, options.Split.Num, enc); err != nil {
 			exit(2, "split failed: %s", err)
 		}
 	case "merge":
-		if err := mergeKey(options.Merge.Args.Pieces); err != nil {
+		if err := mergeKey(options.Merge.Args.Pieces, dec); err != nil {
 			exit(3, "merge failed: %s", err)
 		}
 	default:
