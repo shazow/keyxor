@@ -1,114 +1,88 @@
 package main
 
 import (
-	"flag"
 	"fmt"
-	"io"
 	"os"
 
-	"github.com/shazow/keyxor/soze"
+	flags "github.com/jessevdk/go-flags"
 )
 
 // Version of keyxor, overwritten during build.
 var Version = "dev"
 
-var numSplit = flag.Int("num", 2, "number of components to split the key into")
-var versionFlag = flag.Bool("version", false, "print the version and exit")
+// Options contains the flag options
+type Options struct {
+	Verbose []bool `short:"v" long:"verbose" description:"Show verbose logging."`
+	Version bool   `long:"version" description:"Print version and exit."`
 
-func exit(code int, msg string, a ...interface{}) {
-	fmt.Fprintf(os.Stderr, msg+"\n", a...)
-	os.Exit(code)
+	Split struct {
+		Num  int `short:"n" long:"num" description:"Number of pieces." default:"3"`
+		Args struct {
+			Key string `positional-arg-name:"SECRET"`
+		} `positional-args:"yes" required:"yes"`
+	} `command:"split" description:"Split a secret into secure pieces"`
+
+	Merge struct {
+		Args struct {
+			Pieces []string `required:"2" positional-arg-name:"PIECES"`
+		} `positional-args:"yes" required:"yes"`
+	} `command:"merge" description:"Merge secure pieces into the original secret"`
 }
 
-func splitKey(path string, num int) error {
-	key, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	defer key.Close()
-
-	// Keep track of which files we opened and make sure to close them
-	outs := make([]io.Writer, 0, num)
-	files := make([]*os.File, 0, num)
-	defer func() {
-		for _, f := range files {
-			f.Close()
-		}
-	}()
-
-	// Open a file for writing for each key component
-	for i := 1; i <= num; i++ {
-		filename := fmt.Sprintf("%s.%d", path, i)
-		f, err := os.OpenFile(filename, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
-		if err != nil {
-			return err
-		}
-		outs = append(outs, f)
-		files = append(files, f)
-	}
-
-	if err := soze.Split(key, outs); err != nil {
-		return err
-	}
-
-	// Make sure output files are written to disk
-	for _, f := range files {
-		if err := f.Sync(); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func mergeKey(paths []string) error {
-	num := len(paths)
-	ins := make([]io.Reader, 0, num)
-	files := make([]*os.File, 0, num)
-	defer func() {
-		for _, f := range files {
-			f.Close()
-		}
-	}()
-
-	for _, p := range paths {
-		f, err := os.Open(p)
-		if err != nil {
-			return err
-		}
-		files = append(files, f)
-		ins = append(ins, f)
-	}
-
-	return soze.Merge(os.Stdout, ins)
-}
+const usageExample = `Example:
+  $ echo "hunter2" > secret.txt
+  $ keyxor split secret.txt --num=3
+  $ ls secret.*
+  secret.txt   secret.txt.1   secret.txt.2   secret.txt.3
+  $ cat secret.txt.{1,2,3}
+  [... random symbols]
+  $ keyxor merge secret.txt.{1,2,3}
+  hunter2`
 
 func main() {
-	flag.Parse()
+	options := Options{}
+	parser := flags.NewParser(&options, flags.Default)
+	parser.SubcommandsOptional = true
 
-	if *versionFlag {
+	args, err := parser.Parse()
+	if err != nil {
+		if flagErr, ok := err.(*flags.Error); ok && flagErr.Type == flags.ErrHelp && parser.Active == nil {
+			// Print usage when run with just --help
+			exit(0, usageExample)
+		}
+		if args == nil {
+			exit(1, err.Error())
+		}
+		os.Exit(1)
+		return
+	}
+
+	if options.Version {
 		fmt.Printf("%s\n", Version)
 		os.Exit(0)
 	}
 
-	switch cmd := flag.Arg(0); cmd {
-	case "":
-		exit(1, "must supply a command: split, merge")
+	if parser.Active == nil {
+		parser.WriteHelp(os.Stderr)
+		exit(1, "\nMust specify a command.")
+	}
+
+	switch parser.Active.Name {
 	case "split":
-		path := flag.Arg(1)
-		if path == "" {
-			exit(1, "split: specify a path to a key to split")
-		}
-		if err := splitKey(flag.Arg(1), *numSplit); err != nil {
+		if err := splitKey(options.Split.Args.Key, options.Split.Num); err != nil {
 			exit(2, "split failed: %s", err)
 		}
 	case "merge":
-		args := flag.Args()
-		if len(args) < 3 {
-			exit(1, "merge: need at least 2 key component paths to merge")
-		}
-		if err := mergeKey(args[1:len(args)]); err != nil {
+		if err := mergeKey(options.Merge.Args.Pieces); err != nil {
 			exit(3, "merge failed: %s", err)
 		}
+	default:
+		exit(1, "invalid command: %q", parser.Active)
 	}
+}
+
+// exit prints an error and exits with the given code
+func exit(code int, msg string, a ...interface{}) {
+	fmt.Fprintf(os.Stderr, msg+"\n", a...)
+	os.Exit(code)
 }
