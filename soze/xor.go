@@ -7,3 +7,10 @@ func xorInto(dst, src []byte) {
 		dst[i] ^= src[i]
 	}
 }
+
+// zero will zero out every byte in slice buf.
+func zero(buf []byte) {
+	for i := 0; i < len(buf); i++ {
+		buf[i] = 0
+	}
+}

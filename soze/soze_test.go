@@ -3,12 +3,18 @@ package soze
 import (
 	"bytes"
 	"io"
+	"os"
 	"testing"
 )
 
+func TestMain(m *testing.M) {
+	bufSize = 4 // Small buffer size just to make sure things work across buffer boundaries.
+	os.Exit(m.Run())
+}
+
 // Black box test
 func TestSoze(t *testing.T) {
-	input := "hello world"
+	input := "hello world, how are you doing?"
 
 	inBuf := bytes.NewBufferString(input)
 	n := inBuf.Len()

@@ -23,14 +23,17 @@ func splitWithRand(in io.Reader, outs []io.Writer, randReader io.Reader) error {
 		return errors.New("must have at least two outputs")
 	}
 
+	done := false
 	inBuf, randBuf, combinedBuf := make([]byte, bufSize), make([]byte, bufSize), make([]byte, bufSize)
-	for {
+	for !done {
 		n, err := in.Read(inBuf)
 		if err == io.EOF {
-			return nil
-		}
-		if err != nil {
+			done = true
+		} else if err != nil {
 			return err
+		}
+		if n == 0 {
+			continue
 		}
 
 		// Accumulate the random key components for N-1 keys
@@ -70,7 +73,9 @@ func splitWithRand(in io.Reader, outs []io.Writer, randReader io.Reader) error {
 		if nOut != n {
 			return ErrSizeMismatch{"written output", nOut, n}
 		}
+		zero(combinedBuf[:n])
 	}
+	return nil
 }
 
 // Merge takes an output key writer and N input key component readers, and
@@ -79,25 +84,27 @@ func splitWithRand(in io.Reader, outs []io.Writer, randReader io.Reader) error {
 // input.
 func Merge(out io.Writer, ins []io.Reader) error {
 	inBuf, outBuf := make([]byte, bufSize), make([]byte, bufSize)
-	for {
+	done := false
+	for !done {
 		var n, expected int
 		var err error
 		for i, in := range ins {
 			n, err = in.Read(inBuf)
 			if err == io.EOF {
-				return nil
-			}
-			if err != nil {
+				done = true
+			} else if err != nil {
 				return err
 			}
 			if i == 0 {
 				expected = n
 			} else if n != expected {
 				return ErrSizeMismatch{"read input", n, expected}
+			} else if n == 0 {
+				continue
 			}
 			xorInto(outBuf[:n], inBuf[:n])
 		}
-		if n == 0 {
+		if n == 0 && !done {
 			return ErrSizeMismatch{Message: "input"}
 		}
 
@@ -108,5 +115,7 @@ func Merge(out io.Writer, ins []io.Reader) error {
 		if nOut != n {
 			return ErrSizeMismatch{"written output", nOut, n}
 		}
+		zero(outBuf[:n])
 	}
+	return nil
 }
