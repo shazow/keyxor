@@ -15,6 +15,34 @@ Given an input key, generate N-1 cryptographically secure random values of the k
 ## Usage
 
 ```
+$ keyxor --help
+Usage:
+  keyxor [OPTIONS] [merge | split]
+
+Application Options:
+  -v, --verbose  Show verbose logging.
+      --version  Print version and exit.
+      --base32   Encode output and decode input as Base32
+
+Help Options:
+  -h, --help     Show this help message
+
+Available commands:
+  merge  Merge secure pieces into the original secret
+  split  Split a secret into secure pieces
+
+Example:
+  $ echo "hunter2" > secret.txt
+  $ keyxor split secret.txt --num=3
+  $ ls secret.*
+  secret.txt   secret.txt.1   secret.txt.2   secret.txt.3
+  $ cat secret.txt.{1,2,3}
+  [... random symbols]
+  $ keyxor merge secret.txt.{1,2,3}
+  hunter2
+```
+
+```
 # Use your fav key generator!
 $ ssh-keygen -f key
 $ ls
@@ -47,13 +75,6 @@ Please do. The meat is inside [soze/soze.go](https://github.com/shazow/keyxor/bl
 
 * [@mveytsman](https://github.com/mveytsman), after an informal audit on [c2d26906]( https://github.com/shazow/keyxor/tree/c2d26906fbf4120cb2dc92afd9459dca878e8c86):
   > There's not enough code here to be interesting. ¯\\\_(ツ)\_/¯
-
-
-## Roadmap
-
-- [x] Implement v1 as described above --^
-- [ ] Release v1
-- [ ] **Someday**: Maybe use NaCl box to have built-in key generating and encrypting/decrypting functionality? (Is it worth it?)
 
 
 ## License
