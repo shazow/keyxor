@@ -70,8 +70,8 @@ func main() {
 		exit(1, "\nMust specify a command.")
 	}
 
-	var enc Encoder
-	var dec Decoder
+	var enc encoder
+	var dec decoder
 	if options.Base32 {
 		encoding := base32.StdEncoding
 

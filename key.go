@@ -9,10 +9,10 @@ import (
 	"github.com/shazow/keyxor/soze"
 )
 
-type Encoder func(io.Writer) io.WriteCloser
-type Decoder func(io.Reader) io.Reader
+type encoder func(io.Writer) io.WriteCloser
+type decoder func(io.Reader) io.Reader
 
-func splitKey(path string, num int, enc Encoder) error {
+func splitKey(path string, num int, enc encoder) error {
 	key, err := os.Open(path)
 	if err != nil {
 		return err
@@ -47,7 +47,7 @@ func splitKey(path string, num int, enc Encoder) error {
 	return nil
 }
 
-func mergeKey(paths []string, dec Decoder) error {
+func mergeKey(paths []string, dec decoder) error {
 	ins := make([]io.Reader, 0, len(paths))
 
 	for _, p := range paths {

@@ -2,6 +2,8 @@ package soze
 
 import "fmt"
 
+// ErrSizeMismatch is returned when the written output or read input does not
+// match the size we were expecting.
 type ErrSizeMismatch struct {
 	Message  string
 	Actual   int
