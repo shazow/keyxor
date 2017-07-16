@@ -1,3 +1,6 @@
+[![Build Status](https://circleci.com/gh/shazow/keyxor.svg?style=shield&circle-token=5feff4b31427639729e0d42c5f68b61c92d2bbaf)](https://circleci.com/gh/shazow/keyxor)
+[![GoDoc](https://godoc.org/github.com/shazow/keyxor?status.svg)](https://godoc.org/github.com/shazow/keyxor)
+
 # Keyxor Söze
 
 `keyxor` is a tool for secret sharing by splitting up a key into multiple pieces which need to be XOR'd together to get the original private key. A key XOR, if you will.
